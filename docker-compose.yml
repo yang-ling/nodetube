@@ -9,9 +9,9 @@ services:
     ports:
       - "49161:3000"
     volumes:
-      - /app/node_modules
-      - ./upload:/app/upload
-      - ./uploads:/app/uploads
+      - nodetube_node_modules:/app/node_modules
+      - nodetube_upload:/app/upload
+      - nodetube_uploads:/app/uploads
     environment:
       - REDIS_HOST=redis
       - MONGODB_URI=mongodb://nodetube-mongo:27017/nodetube
@@ -26,9 +26,9 @@ services:
     container_name: nodetube-mongo
     image: mongo:4.4
     volumes:
-      - ./data/db:/data/db
-    ports:
-      - "27011:27017"
+      - nodetube_db:/data/db
+    expose:
+      - "27017"
     networks:
       - nodetube-network
 
@@ -38,6 +38,19 @@ services:
     networks:
       - nodetube-network
 
+volumes:
+  nodetube_node_modules:
+    driver: local
+  nodetube_upload:
+    driver: local
+  nodetube_uploads:
+    driver: local
+  nodetube_db:
+    driver: local
+
 networks:
   nodetube-network:
-    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: "192.168.100.0/24"
